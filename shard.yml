@@ -1,0 +1,13 @@
+name: connect_4
+version: 0.1.0
+
+authors:
+  -  <>
+
+targets:
+  connect_4:
+    main: src/connect_4.cr
+
+crystal: 0.20.5
+
+license: MIT
