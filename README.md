@@ -1,10 +1,11 @@
 # connect_4
 
-TODO: Write a description here
+A simple Connect 4 program with AI opponent written in Crystal that doesn't actually work.
 
 ## Usage
 
-TODO: Write usage instructions here
+1. Compile source file ./src/connect_4.cr
+2. Don't bother, step one doesn't work
 
 ## Contributing
 
