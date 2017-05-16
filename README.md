@@ -9,7 +9,7 @@ A simple Connect 4 program with AI opponent written in Crystal that doesn't actu
 
 ## Contributing
 
-1. Fork it ( https://github.com/[your-github-name]/connect_4/fork )
+1. Fork it ( https://github.com/papaskrobe/connect_4/fork )
 2. Create your feature branch (git checkout -b my-new-feature)
 3. Commit your changes (git commit -am 'Add some feature')
 4. Push to the branch (git push origin my-new-feature)

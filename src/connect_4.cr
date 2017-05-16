@@ -127,6 +127,15 @@ end
 class Game
 	def initialize(board = Board.new)
 		@board = board
+		@victor = -1
+	end
+
+	def victor
+		return @victor
+	end
+
+	def board
+		return @board
 	end
 
 	def hypothetical(board, col, piece)
@@ -140,12 +149,14 @@ class Game
 	end
 
 	def decide #AI is ones
-		data = [] of Array(Int32)
+		data = [0] * 7
 		7.times do |x|
-			data[x][0] = hypothetical(@board.board, x, 0)
-			data[x][1] = hypothetical(@board.board, x, 1)
+			data[x] = hypothetical(@board.board, x, 0)
+			if (hypothetical(@board.board, x, 1) > data[x])
+				data[x] = hypothetical(@board.board, x, 1)
+			end
 		end
-		decision = data.map { |x| (10 ** (x.max)) / 10 }
+		decision = data.map { |x| (10 ** x) / 10 }
 		final = rand decision.sum
 		sum = 0
 		p decision
@@ -157,7 +168,7 @@ class Game
 		end
 	end
 
-	def play
+	def play_ai
 		player_turn = true
 		while @board.check(0) < 4 && @board.check(1) < 4
 			if player_turn
@@ -185,16 +196,15 @@ class Game
 		end
 		@board.display
 	end
+
+	play_human
+		player0_turn = true
+		while @board.check(0) < 4 && @board.check(1) < 4
+
+		end
+	end
 end
 
 #end
 
-Game.new.play
-#board = Board.new
-#board.add(0,1)
-#board.add(1,0)
-#board.add(1,1)
-#board.display
-#puts board.check(1)
-
-
+Game.new.play_ai
