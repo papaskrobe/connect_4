@@ -148,11 +148,11 @@ class Game
 		end
 	end
 
-	def decide #AI is ones
+	def ai_player(piece)
 		data = [0] * 7
 		7.times do |x|
-			data[x] = hypothetical(@board.board, x, 0)
-			if (hypothetical(@board.board, x, 1) > data[x])
+			data[x] = hypothetical(@board.board, x, (1 - piece))
+			if (hypothetical(@board.board, x, piece) > data[x])
 				data[x] = hypothetical(@board.board, x, 1)
 			end
 		end
@@ -168,24 +168,27 @@ class Game
 		end
 	end
 
-	def play_ai
+	def human_player
+		puts "  " + (0..6).to_a.join("    ")
+		@board.display
+		choice = -1
+		until (choice.class == Int32 && (choice >= 0 && choice <= 6)) && (hypothetical(@board.board, choice, 0) > 0)
+			print "Enter column choice: "
+			player_input = gets
+			if player_input.responds_to?(:to_i)
+				choice = player_input.to_i
+			end
+		end
+		return choice
+	end
+
+	def play
 		player_turn = true
 		while @board.check(0) < 4 && @board.check(1) < 4
 			if player_turn
-				choice = -1
-				puts "  " + (0..6).to_a.join("    ")
-				@board.display
-				until (choice.class == Int32 && (choice >= 0 && choice <= 6)) && (hypothetical(@board.board, choice, 0) > 0)
-					print "Enter column choice: "
-					player_input = gets
-					if player_input.responds_to?(:to_i)
-						choice = player_input.to_i
-					end
-				end
-				@board.add(choice, 0)
-				choice = nil
+				@board.add(human_player, 0)
 			else
-				@board.add(decide.as(Int32), 1)
+				@board.add(ai_player(1).as(Int32), 1)
 			end
 			player_turn = !player_turn
 		end
@@ -197,14 +200,14 @@ class Game
 		@board.display
 	end
 
-	play_human
-		player0_turn = true
-		while @board.check(0) < 4 && @board.check(1) < 4
-
-		end
-	end
 end
 
 #end
 
-Game.new.play_ai
+#Human_player(piece)
+#Shitty_AI(piece)
+#add_piece(piece)
+#Play_game(
+
+
+Game.new.play
