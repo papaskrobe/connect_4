@@ -1,6 +1,20 @@
 require "./connect_4/*"
+require "../lib/matrix/src/matrix.cr"
+require "yaml"
 
-#module Connect4
+def sigmoid(val : Float64)
+	return 1.0 / (1.0 + (2.71828 ** (-val)))
+end
+
+def sigmoid(val : Matrix(Float64))
+	out_matrix = Matrix.new(val.rows.size, val.columns.size) {0.0}
+	(val.rows.size * val.columns.size).times do |x|
+		out_matrix[x] = sigmoid(val[x])
+	end
+	out_matrix
+end
+
+module Connect4
 
 class Board
 	def initialize()
@@ -120,8 +134,6 @@ class Board
 		@board.each { |x| out.push(x.dup) }
 		out
 	end
-
-	#attr_reader :board
 end
 
 class Game
@@ -130,18 +142,17 @@ class Game
 		@victor = -1
 	end
 
-	def victor
+	def victor()
 		return @victor
 	end
 
-	def board
+	def board()
 		return @board
 	end
 
 	def hypothetical(board, col, piece)
 		x = Board.new(board)
-		x.add(col, piece)
-		if x
+		if x.add(col, piece)
 			return x.check(piece)
 		else
 			return 0
@@ -151,6 +162,11 @@ class Game
 	def ai_player(piece)
 		data = [0] * 7
 		7.times do |x|
+			if hypothetical(@board.board, x, piece) >= 4
+				return x
+			elsif hypothetical(@board.board, x, (1 - piece)) >= 4
+				return x
+			end
 			data[x] = hypothetical(@board.board, x, (1 - piece))
 			if (hypothetical(@board.board, x, piece) > data[x])
 				data[x] = hypothetical(@board.board, x, 1)
@@ -159,7 +175,7 @@ class Game
 		decision = data.map { |x| (10 ** x) / 10 }
 		final = rand decision.sum
 		sum = 0
-		p decision
+		#p decision
 		decision.size.times do |x|
 			sum += decision[x]
 			if sum >= final
@@ -168,7 +184,7 @@ class Game
 		end
 	end
 
-	def human_player
+	def human_player()
 		puts "  " + (0..6).to_a.join("    ")
 		@board.display
 		choice = -1
@@ -182,32 +198,64 @@ class Game
 		return choice
 	end
 
-	def play
+	def neural_ai(piece, neural : Array(Matrix(Float64))) 
+		input_layer = @board.board.flatten.map do |x|
+			[x == piece ? 1.0 : 0.0, x == (1 - piece) ? 1.0 : 0.0]
+		end
+		input_layer = input_layer.flatten.unshift(1.0) #85 total
+		input_matrix = Matrix.columns([input_layer])
+		layer_one = Matrix.columns([sigmoid(input_matrix.transpose * neural[0]).to_a.unshift(1.0)])
+		layer_two = Matrix.columns([sigmoid(layer_one.transpose * neural[1]).to_a.unshift(1.0)])
+		output_matrix = sigmoid(layer_two.transpose * neural[2]).to_a
+
+		@board.board[0].size.times do |x|
+			if @board.board[0][x]
+				output_matrix[x] = 0.0
+			end
+		end
+
+		if (output_matrix.sum < 0.5)
+			return -1
+		else
+			final = rand output_matrix.sum
+			sum = 0
+			output_matrix.size.times do |x|
+				sum += output_matrix[x]
+				if sum >= final
+					return x
+				end
+			end
+		end
+	end
+
+	def play(net : Array(Matrix(Float64)))
 		player_turn = true
 		while @board.check(0) < 4 && @board.check(1) < 4
 			if player_turn
-				@board.add(human_player, 0)
+				#@board.add(human_player, 0)
+				@board.add(ai_player(0).as(Int32), 0)
 			else
-				@board.add(ai_player(1).as(Int32), 1)
+				#@board.add(ai_player(1).as(Int32), 1)
+				col = neural_ai(1, net).as(Int32)
+				if col == -1
+					return 0
+				else
+					@board.add(col, 1)
+				end
 			end
 			player_turn = !player_turn
 		end
 		if @board.check(0) >= 4
-			puts "Congratulations! You beat this dumbass robot!"
+			#puts "Congratulations! You beat this robot!"
+			winner = 0
 		else
-			puts "Holy shit, you lost to this dumbass robot."
+			#puts "Oh no, you lost to this robot."
+			winner = 1
 		end
-		@board.display
+		return winner
 	end
 
 end
 
-#end
+end
 
-#Human_player(piece)
-#Shitty_AI(piece)
-#add_piece(piece)
-#Play_game(
-
-
-Game.new.play

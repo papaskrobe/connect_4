@@ -8,6 +8,11 @@ targets:
   connect_4:
     main: src/connect_4.cr
 
+dependencies:
+  matrix:
+    github: Exilor/matrix
+    branch: master
+
 crystal: 0.20.5
 
 license: MIT

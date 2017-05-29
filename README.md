@@ -1,11 +1,15 @@
 # connect_4
 
-A simple Connect 4 program with AI opponent written in Crystal that doesn't actually work.
+A simple Connect 4 program with AI opponent written in Crystal
 
 ## Usage
 
 1. Compile source file ./src/connect_4.cr
-2. Don't bother, step one doesn't work
+2. Game class has methods for three types of players:
+	-human_player: asks user for input
+	-ai_player: a fairly greedy ai
+	-neural_ai: neural network-based ai; takes three Matrix-class matricies as input(opponent neural networks forthcoming)
+
 
 ## Contributing
 
