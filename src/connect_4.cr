@@ -135,8 +135,12 @@ class Board
 		out
 	end
 
-	def full?
-		return @board.flatten.compact.size == 42
+	def full?(col = -1)
+		if (col < 0 || col > 6)
+			return @board.flatten.compact.size == 42
+		else
+			return @board[0][col] != nil
+		end
 	end
 end
 
