@@ -134,6 +134,10 @@ class Board
 		@board.each { |x| out.push(x.dup) }
 		out
 	end
+
+	def full?
+		return @board.flatten.compact.size == 42
+	end
 end
 
 class Game
@@ -173,13 +177,17 @@ class Game
 			end
 		end
 		decision = data.map { |x| (10 ** x) / 10 }
-		final = rand decision.sum
-		sum = 0
-		#p decision
-		decision.size.times do |x|
-			sum += decision[x]
-			if sum >= final
-				return x
+		if decision.sum == 0
+			return -1
+		else
+			final = rand decision.sum
+			sum = 0
+			#p decision
+			decision.size.times do |x|
+				sum += decision[x]
+				if sum >= final
+					return x
+				end
 			end
 		end
 	end
@@ -205,8 +213,8 @@ class Game
 		input_layer = input_layer.flatten.unshift(1.0) #85 total
 		input_matrix = Matrix.columns([input_layer])
 		layer_one = Matrix.columns([sigmoid(input_matrix.transpose * neural[0]).to_a.unshift(1.0)])
-		layer_two = Matrix.columns([sigmoid(layer_one.transpose * neural[1]).to_a.unshift(1.0)])
-		output_matrix = sigmoid(layer_two.transpose * neural[2]).to_a
+		#layer_two = Matrix.columns([sigmoid(layer_one.transpose * neural[1]).to_a.unshift(1.0)])
+		output_matrix = sigmoid(layer_one.transpose * neural[1]).to_a
 
 		@board.board[0].size.times do |x|
 			if @board.board[0][x]
@@ -229,11 +237,16 @@ class Game
 	end
 
 	def play(net : Array(Matrix(Float64)))
-		player_turn = true
+		player_turn = true #current settings: player = dumbass_ai, !player = neural_ai
 		while @board.check(0) < 4 && @board.check(1) < 4
 			if player_turn
 				#@board.add(human_player, 0)
-				@board.add(ai_player(0).as(Int32), 0)
+				col = ai_player(0).as(Int32)
+				if col == -1
+					return 0
+				else
+					@board.add(col, 0)
+				end
 			else
 				#@board.add(ai_player(1).as(Int32), 1)
 				col = neural_ai(1, net).as(Int32)
@@ -258,4 +271,3 @@ class Game
 end
 
 end
-
